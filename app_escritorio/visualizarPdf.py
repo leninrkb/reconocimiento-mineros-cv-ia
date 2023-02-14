@@ -1,10 +1,10 @@
 from conexionBD import Datos
+from components import components
 
-from PyQt5 import QtWidgets
-from PyQt5.QtGui  import QIcon, QFont, QTextDocument, QPixmap
+from PyQt5.QtGui  import QIcon, QFont, QTextDocument
 from PyQt5.QtCore import Qt, QTextCodec, QByteArray, QTranslator, QLocale, QLibraryInfo
-from PyQt5.QtWidgets import (QApplication, QTreeWidget, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
-                             QMessageBox, QToolBar)
+from PyQt5.QtWidgets import (QApplication, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
+                             QMessageBox, QToolBar,QTableWidgetItem, QAbstractItemView)
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter, QPrintPreviewDialog
 from PIL import Image
 
@@ -17,7 +17,7 @@ class visualizarImprimirExportar(QDialog):
         self.setWindowTitle("Visualizar Datos y Exportar a PDF")
         self.setWindowIcon(QIcon("Qt.png"))
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(1000, 700)
+        self.setFixedSize(721, 700)
 
         self.initUI()
 
@@ -36,25 +36,6 @@ class visualizarImprimirExportar(QDialog):
 
     # =================== WIDGET QTABLEWIDGET ===================
         self.tableWidget = QTableWidget(self)
-
-      # =================== WIDGET QTREEWIDGET ===================
-
-        self.treeWidgetUsuarios = QTreeWidget(self)
-
-        self.treeWidgetUsuarios.setFont(QFont(self.treeWidgetUsuarios.font().family(), 10, False))
-        self.treeWidgetUsuarios.setRootIsDecorated(False)
-        self.treeWidgetUsuarios.setHeaderLabels(("CEDULA", "NOMBRE", "APELLIDO", "FECHA DE INGRESO", "EVIDENCIA"))
-
-        self.model = self.treeWidgetUsuarios.model()
-
-        for indice, ancho in enumerate((110, 150, 150, 160), start=0):
-            self.model.setHeaderData(indice, Qt.Horizontal, Qt.AlignCenter, Qt.TextAlignmentRole)
-            self.treeWidgetUsuarios.setColumnWidth(indice, ancho)
-        
-        self.treeWidgetUsuarios.setAlternatingRowColors(True)
-
-        self.treeWidgetUsuarios.setFixedSize(900, 500)
-        self.treeWidgetUsuarios.move(20, 56)
 
       # =================== WIDGETS QPUSHBUTTON ==================
 
@@ -81,113 +62,97 @@ class visualizarImprimirExportar(QDialog):
         buttonExportarPDF.clicked.connect(self.exportarPDF)
 
   # ======================= FUNCIONES ============================
-    def llenarTabla(self):
+    def configurar_Tabla(self):
+        colum_labels = ("Cédula", "Nombre", "Apellido", "Fecha y Hora de Ingreso", "Evidencia")
+        self.tableWidget.setColumnCount(len(colum_labels))
+        self.tableWidget.setHorizontalHeaderLabels(colum_labels)
+        self.tableWidget.setColumnWidth(4,200)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(150)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setFixedSize(721,500 )
+
+    def llenar_Tabla(self):
         bd = Datos()
         results = bd.obtenerRegistroEmpleado()
-        for row_number, row_data in enumerate(results):
-            self.tableWidget.insertRow(row_number)
-            for column_number, column_data in enumerate(row_data):
-                item = str(column_data)
-                if(column_number == 0):
-                    item = self.getImageLabel(column_data)
-                    self.tableWidget.setCellWidget(row_number, column_number, item)
+        self.tableWidget.setRowCount(len(results))
+        datos = ""
+
+        for (index_row, row) in enumerate(results): 
+            datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><img src='%s' style='width:50px;height:50px;'></td></tr>" %row
+            for (index_cell, cell) in enumerate(row):
+                if index_cell == 4:
+                    self.tableWidget.setCellWidget(
+                        index_row, index_cell,components.ReporteImg(cell)
+                    )
                 else:
-                    self.tableWidget.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(item))
+                    self.tableWidget.setItem(
+                        index_row, index_cell, QTableWidgetItem(str(cell))
+                    )
+        reporteHtml = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <style>
+            h3 {
+                font-family: Helvetica-Bold;
+                text-align: center;
+            }
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                }
+            td {
+                text-align: left;
+                padding-top: 4px;
+                padding-right: 6px;
+                padding-bottom: 2px;
+                padding-left: 6px;
+            }
+            th {
+                text-align: left;
+                padding: 4px;
+                background-color: #6ba52a;
+                color: white;
+            }
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+            </style>
+            </head>
 
-    def getImageLabel(self, image):
-        imageLabel = QtWidgets.QLabel(self.centralwidget)
-        imageLabel.setText("")
-        imageLabel.setScaledContents(True)
-        pixmap = QPixmap()
-        pixmap.loadFromData(image, 'png')
-        imageLabel.setPixmap(pixmap)
-        return imageLabel
+            <body>
+            <header>
+                <img src="img/logo.jpg" width="800" height="70"/>
+            </header>
 
-    def Buscar(self):
-        bd = Datos()
-        results = bd.obtenerRegistroEmpleado()
+            <h3>Reportes Empleados<br/></h3>
 
-        if results:
-            self.documento.clear()
-            self.treeWidgetUsuarios.clear()
+            <table align="left" width="100%" cellspacing="0">
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Fecha y Hora de Ingreso</th>
+                <th>Evidencia de Ingreso</th>
+            </tr>
+            [DATOS]
+            </table>
 
-            datos = ""
-            item_widget = []
-            for dato in results:
-                datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %dato
-                imagen = Image.open(str(dato[4]))
-                item_widget.append(QTreeWidgetItem((dato[0], dato[1], dato[2], str(dato[3]), imagen.show())))
-
-            reporteHtml = """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-h3 {
-    font-family: Helvetica-Bold;
-    text-align: center;
-   }
-table {
-       font-family: arial, sans-serif;
-       border-collapse: collapse;
-       width: 100%;
-      }
-td {
-    text-align: left;
-    padding-top: 4px;
-    padding-right: 6px;
-    padding-bottom: 2px;
-    padding-left: 6px;
-   }
-th {
-    text-align: left;
-    padding: 4px;
-    background-color: #6ba52a;
-    color: white;
-   }
-tr:nth-child(even) {
-    background-color: #dddddd;
-}
-</style>
-</head>
-
-<body>
-<header>
-    <img src="img/logo.jpg" width="800" height="70"/>
-</header>
-
-<h3>Reportes Empleados<br/></h3>
-
-<table align="left" width="100%" cellspacing="0">
-  <tr>
-    <th>Cédula</th>
-    <th>Nombre</th>
-    <th>Apellido</th>
-    <th>Fecha y Hora de Ingreso</th>
-    <th>Evidencia de Ingreso</th>
-  </tr>
-  [DATOS]
-</table>
-
-</body>
-</html>
+            </body>
+            </html>
 """.replace("[DATOS]", datos)
 
-            datos = QByteArray()
-            datos.append(str(reporteHtml))
-            codec = QTextCodec.codecForHtml(datos)
-            unistr = codec.toUnicode(datos)
+        datos = QByteArray()
+        datos.append(str(reporteHtml))
+        codec = QTextCodec.codecForHtml(datos)
+        unistr = codec.toUnicode(datos)
 
-            if Qt.mightBeRichText(unistr):
-                self.documento.setHtml(unistr)
-            else:
-                self.documento.setPlainText(unistr)
-
-            self.treeWidgetUsuarios.addTopLevelItems(item_widget)
+        if Qt.mightBeRichText(unistr):
+            self.documento.setHtml(unistr)
         else:
-            QMessageBox.information(self, "Buscar empleados", "No se encontraron resultados.      ",
-                                    QMessageBox.Ok)
+            self.documento.setPlainText(unistr)
 
     def limpiarTabla(self):
         self.documento.clear()
@@ -271,8 +236,9 @@ if __name__ == '__main__':
     aplicacion.setFont(fuente)
     
     ventana = visualizarImprimirExportar()
-    ventana.Buscar()
-    #ventana.llenarTabla()
+    #ventana.Buscar()
+    ventana.configurar_Tabla()
+    ventana.llenar_Tabla()
     ventana.show()
     
 
