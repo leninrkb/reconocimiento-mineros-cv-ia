@@ -1,40 +1,49 @@
-# YOLOv5 🚀 by Ultralytics, GPL-3.0 license
-"""
-Run YOLOv5 detection inference on images, videos, directories, globs, YouTube, webcam, streams, etc.
-
-Usage - sources:
-    $ python detect.py --weights yolov5s.pt --source 0                               # webcam
-                                                     img.jpg                         # image
-                                                     vid.mp4                         # video
-                                                     screen                          # screenshot
-                                                     path/                           # directory
-                                                     list.txt                        # list of images
-                                                     list.streams                    # list of streams
-                                                     'path/*.jpg'                    # glob
-                                                     'https://youtu.be/Zgi9g1ksQHc'  # YouTube
-                                                     'rtsp://example.com/media.mp4'  # RTSP, RTMP, HTTP stream
-
-Usage - formats:
-    $ python detect.py --weights yolov5s.pt                 # PyTorch
-                                 yolov5s.torchscript        # TorchScript
-                                 yolov5s.onnx               # ONNX Runtime or OpenCV DNN with --dnn
-                                 yolov5s_openvino_model     # OpenVINO
-                                 yolov5s.engine             # TensorRT
-                                 yolov5s.mlmodel            # CoreML (macOS-only)
-                                 yolov5s_saved_model        # TensorFlow SavedModel
-                                 yolov5s.pb                 # TensorFlow GraphDef
-                                 yolov5s.tflite             # TensorFlow Lite
-                                 yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
-                                 yolov5s_paddle_model       # PaddlePaddle
-"""
-
 import argparse
 import os
 import platform
 import sys
 from pathlib import Path
+import tkinter as tk
+
+import torch as torch
+from PIL import Image, ImageTk
+import cv2
+import imutils
+
 
 import torch
+
+#INTERFAZ
+ventana = tk.Tk()
+ventana.geometry("994x699+200+10")
+ventana.title("Interfaz")
+ventana.resizable(width=False, height=False)
+fondo = tk.PhotoImage(file="camara.png")
+fondo1 = tk.Label(ventana, image=fondo).place(x=0, y=0, relwidth=1, relheight=1)
+
+
+def iniciar():
+    opt = parse_opt()
+    main(opt)
+
+#Color
+fondo_boton = "#FFF"
+
+
+#BOTONES
+boton = tk.Button(ventana, text="INICIAR", bg=fondo_boton, relief="flat",
+                  cursor="hand2", command=iniciar, width=15, height=2, font=("Calisto MT", 12, "bold"))
+boton.place(x=165, y=590)
+
+boton2 = tk.Button(ventana, text="APAGAR", bg=fondo_boton, relief="flat",
+                  cursor="hand2", width=15, height=2, font=("Calisto MT", 12, "bold"))
+boton2.place(x=665, y=590)
+
+
+#Etiqueta
+etiq_video = tk.Label(ventana, bg="black")
+etiq_video.place(x=247, y=119)
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -261,6 +270,8 @@ def main(opt):
     run(**vars(opt))
 
 
-if __name__ == "__main__":
+'''if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
+'''
+ventana.mainloop()
