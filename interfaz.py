@@ -11,8 +11,8 @@ ventana = tk.Tk()
 ventana.geometry("1241x600+200+10")
 ventana.title("Interfaz")
 ventana.resizable(width=False, height=False)
-#fondo = tk.PhotoImage(file="interfaz.png")
-#fondo1 = tk.Label(ventana, image=fondo).place(x=0, y=0, relwidth=1, relheight=1)
+fondo = tk.PhotoImage(file="interfaz.png")
+fondo1 = tk.Label(ventana, image=fondo).place(x=0, y=0, relwidth=1, relheight=1)
 
 # Crear la entrada de texto
 entry = tk.Entry(ventana, cursor="hand2", width=38)
@@ -32,7 +32,7 @@ fondo_boton = "#FFF"
 
 #BOTONES
 # Crear una función lambda que llame a la función con los parámetros
-my_lambda = lambda: run_command("python detect.py --weights best.pt --source 0")
+my_lambda = lambda: run_command("python detect.py")
 
 boton = tk.Button(ventana, text="INGRESAR", bg=fondo_boton, relief="flat",
                   cursor="hand2", command=my_lambda, width=35, height=2, font=("Calisto MT", 15, "bold"))
