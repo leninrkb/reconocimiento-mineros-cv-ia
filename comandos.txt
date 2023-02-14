@@ -1,0 +1,8 @@
+reconocer una imagen 
+python detect.py --weights [dir del modelo entrenado] --img 640 --conf 0.25 --source "[ruta de la img]"
+
+mostrar img que se va a trabajar
+display.Image(filename='[ruta de la img]', width=600)
+
+reconocer objetos en video
+python detect.py --weights [modelo entrenado] --source 0 --conf-thres 0.80 
