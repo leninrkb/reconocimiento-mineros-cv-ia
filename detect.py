@@ -257,6 +257,9 @@ def run(
                 cv2.waitKey(1)  # 1 millisecond
             imagen()
 
+            if cv2.waitKey(1) == 113 or not cv2.getWindowProperty(source, cv2.WND_PROP_VISIBLE):     
+                cv2.destroyWindow(source)
+
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
