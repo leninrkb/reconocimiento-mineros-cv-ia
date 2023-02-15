@@ -1,63 +1,61 @@
 import tkinter as tk
-
+import subprocess
 import torch as torch
 from PIL import Image, ImageTk
 import cv2
 import imutils
 
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+from app_escritorio.visualizarPdf import visualizarImprimirExportar
+app = QApplication(sys.argv)
+
 
 #Interfaz
 ventana = tk.Tk()
-ventana.geometry("994x699+200+10")
+ventana.geometry("1241x600+200+10")
 ventana.title("Interfaz")
 ventana.resizable(width=False, height=False)
-fondo = tk.PhotoImage(file="camara.png")
+fondo = tk.PhotoImage(file="")
 fondo1 = tk.Label(ventana, image=fondo).place(x=0, y=0, relwidth=1, relheight=1)
 
-video = None
+# Crear la entrada de texto
+entry = tk.Entry(ventana, cursor="hand2", width=38)
+entry.config(font=('Helvetica', 15))
+entry.place(x=664, y=210)
 
-def video_stream():
-    global video
-    video = cv2.VideoCapture(0)
-    iniciar()
 
-def iniciar():
-    global video
-    ret, frame = video.read()
+def run_command(command):
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    return stdout, stderr
 
-    if ret == True:
-        frame = imutils.resize(frame, width=491, height=900)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(frame)
-        image = ImageTk.PhotoImage(image=img)
-        etiq_video.configure(image=image)
-        etiq_video.image = image
-        etiq_video.after(9, iniciar)
-    else:
-        etiq_video.image = ""
-        video.release()
+def mostrar_datos():
+    # Crear una instancia de la clase MiClase
+    mi_clase =  visualizarImprimirExportar()
 
-def quitar():
-    global video
-    #etiq_video.place_forget()
-    video.release()
+    # Mostrar la ventana
+    mi_clase.show()
+
+    # Iniciar la aplicación
+    sys.exit(app.exec_())
 
 #Color
 fondo_boton = "#FFF"
 
 
 #BOTONES
-boton = tk.Button(ventana, text="INICIAR", bg=fondo_boton, relief="flat",
-                  cursor="hand2", command=video_stream, width=15, height=2, font=("Calisto MT", 12, "bold"))
-boton.place(x=165, y=590)
+# Crear una función lambda que llame a la función con los parámetros
+my_lambda = lambda: run_command("python detect.py")
 
-boton2 = tk.Button(ventana, text="APAGAR", bg=fondo_boton, relief="flat",
-                  cursor="hand2", command=quitar, width=15, height=2, font=("Calisto MT", 12, "bold"))
-boton2.place(x=665, y=590)
+boton = tk.Button(ventana, text="INGRESAR", bg=fondo_boton, relief="flat",
+                  cursor="hand2", command=my_lambda, width=35, height=2, font=("Calisto MT", 15, "bold"))
+boton.place(x=664, y=344)
 
-#Etiqueta
-etiq_video = tk.Label(ventana, bg="black")
-etiq_video.place(x=247, y=119)
+boton1 = tk.Button(ventana, text="REPORTES", bg=fondo_boton, relief="flat",
+                  cursor="hand2", command=mostrar_datos, width=35, height=2, font=("Calisto MT", 15, "bold"))
+boton1.place(x=664, y=503)
+
 
 
 ventana.mainloop()

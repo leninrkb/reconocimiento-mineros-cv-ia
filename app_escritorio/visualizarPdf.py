@@ -1,5 +1,5 @@
-from conexionBD import Datos
-from components import components
+from app_escritorio.conexionBD import Datos
+from app_escritorio.components import components
 
 from PyQt5.QtGui  import QIcon, QFont, QTextDocument
 from PyQt5.QtCore import Qt, QTextCodec, QByteArray, QTranslator, QLocale, QLibraryInfo

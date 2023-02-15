@@ -26,6 +26,11 @@ def iniciar():
     opt = parse_opt()
     main(opt)
 
+def quitar():
+    global cap
+    #etiq_cap.place_forget()
+    cap.release()
+
 #Color
 fondo_boton = "#FFF"
 
@@ -36,7 +41,7 @@ boton = tk.Button(ventana, text="INICIAR", bg=fondo_boton, relief="flat",
 boton.place(x=165, y=590)
 
 boton2 = tk.Button(ventana, text="APAGAR", bg=fondo_boton, relief="flat",
-                  cursor="hand2", width=15, height=2, font=("Calisto MT", 12, "bold"))
+                  cursor="hand2", command=quitar, width=15, height=2, font=("Calisto MT", 12, "bold"))
 boton2.place(x=665, y=590)
 
 
@@ -58,6 +63,7 @@ from utils.general import (LOGGER, Profile, check_file, check_img_size, check_im
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
 
+cap = None
 
 @smart_inference_mode()
 def run(
@@ -118,13 +124,13 @@ def run(
         #print(dataset)'''
         ret,frame=cap.read()
         if ret == True:
-            frame = imutils.resize(frame, width=491, height=900)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = imutils.resize(frame, width=491, height=900)            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(frame)
             image = ImageTk.PhotoImage(image=img)
             etiq_video.configure(image=image)
             etiq_video.image = image
-            #etiq_video.after(9, iniciar)
+            etiq_video.after(9, iniciar)
+
     elif screenshot:
         dataset = LoadScreenshots(source, img_size=imgsz, stride=stride, auto=pt)
     else:
@@ -243,6 +249,7 @@ def run(
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
+
 
 
 def parse_opt():
