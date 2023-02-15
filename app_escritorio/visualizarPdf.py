@@ -1,9 +1,10 @@
 from conexionBD import Datos
 from components import components
 
-from PyQt5.QtGui  import QIcon, QFont, QTextDocument
+from PyQt5 import QtWidgets
+from PyQt5.QtGui  import QIcon, QFont, QTextDocument, QPixmap
 from PyQt5.QtCore import Qt, QTextCodec, QByteArray, QTranslator, QLocale, QLibraryInfo
-from PyQt5.QtWidgets import (QApplication, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
+from PyQt5.QtWidgets import (QApplication, QTreeWidget, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
                              QMessageBox, QToolBar,QTableWidgetItem, QAbstractItemView)
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter, QPrintPreviewDialog
 from PIL import Image
@@ -37,6 +38,24 @@ class visualizarImprimirExportar(QDialog):
     # =================== WIDGET QTABLEWIDGET ===================
         self.tableWidget = QTableWidget(self)
 
+      # =================== WIDGET QTREEWIDGET ===================
+        '''self.treeWidgetUsuarios = QTreeWidget(self)
+
+        self.treeWidgetUsuarios.setFont(QFont(self.treeWidgetUsuarios.font().family(), 10, False))
+        self.treeWidgetUsuarios.setRootIsDecorated(False)
+        self.treeWidgetUsuarios.setHeaderLabels(("CEDULA", "NOMBRE", "APELLIDO", "FECHA DE INGRESO", "EVIDENCIA"))
+
+        self.model = self.treeWidgetUsuarios.model()
+
+        for indice, ancho in enumerate((110, 150, 150, 160), start=0):
+            self.model.setHeaderData(indice, Qt.Horizontal, Qt.AlignCenter, Qt.TextAlignmentRole)
+            self.treeWidgetUsuarios.setColumnWidth(indice, ancho)
+        
+        self.treeWidgetUsuarios.setAlternatingRowColors(True)
+
+        self.treeWidgetUsuarios.setFixedSize(900, 500)
+        self.treeWidgetUsuarios.move(20, 56)'''
+       
       # =================== WIDGETS QPUSHBUTTON ==================
 
         buttonVistaPrevia = QPushButton("Vista previa", self)
@@ -63,22 +82,23 @@ class visualizarImprimirExportar(QDialog):
 
   # ======================= FUNCIONES ============================
     def configurar_Tabla(self):
+        self.tableWidget.setFont(QFont(self.tableWidget.font().family(), 10, False))
         colum_labels = ("Cédula", "Nombre", "Apellido", "Fecha y Hora de Ingreso", "Evidencia")
         self.tableWidget.setColumnCount(len(colum_labels))
         self.tableWidget.setHorizontalHeaderLabels(colum_labels)
         self.tableWidget.setColumnWidth(4,200)
         self.tableWidget.verticalHeader().setDefaultSectionSize(150)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setFixedSize(721,500 )
+        self.tableWidget.setFixedSize(721, 500)
+
 
     def llenar_Tabla(self):
         bd = Datos()
         results = bd.obtenerRegistroEmpleado()
         self.tableWidget.setRowCount(len(results))
         datos = ""
-
         for (index_row, row) in enumerate(results): 
-            datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><img src='%s' style='width:50px;height:50px;'></td></tr>" %row
+            datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><img src='%s'></td></tr>" %row
             for (index_cell, cell) in enumerate(row):
                 if index_cell == 4:
                     self.tableWidget.setCellWidget(
@@ -89,59 +109,66 @@ class visualizarImprimirExportar(QDialog):
                         index_row, index_cell, QTableWidgetItem(str(cell))
                     )
         reporteHtml = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <meta charset="UTF-8">
-            <style>
-            h3 {
-                font-family: Helvetica-Bold;
-                text-align: center;
-            }
-            table {
-                font-family: arial, sans-serif;
-                border-collapse: collapse;
-                width: 100%;
-                }
-            td {
-                text-align: left;
-                padding-top: 4px;
-                padding-right: 6px;
-                padding-bottom: 2px;
-                padding-left: 6px;
-            }
-            th {
-                text-align: left;
-                padding: 4px;
-                background-color: #6ba52a;
-                color: white;
-            }
-            tr:nth-child(even) {
-                background-color: #dddddd;
-            }
-            </style>
-            </head>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+h3 {
+    font-family: Helvetica-Bold;
+    text-align: center;
+   }
+table {
+       font-family: arial, sans-serif;
+       border-collapse: collapse;
+       width: 100%;
+      }
+td {
+    text-align: left;
+    padding-top: 4px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    padding-left: 6px;
+   }
+th {
+    text-align: left;
+    padding: 4px;
+    background-color: #6ba52a;
+    color: white;
+   }
+   tr {
+  text-align: center;
+}
 
-            <body>
-            <header>
-                <img src="img/logo.jpg" width="800" height="70"/>
-            </header>
+td {
+  vertical-align: middle;
+}
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
 
-            <h3>Reportes Empleados<br/></h3>
+<body>
+<header>
+    <img src="img/logo.jpg" width="800" height="70"/>
+</header>
 
-            <table align="left" width="100%" cellspacing="0">
-            <tr>
-                <th>Cédula</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Fecha y Hora de Ingreso</th>
-                <th>Evidencia de Ingreso</th>
-            </tr>
-            [DATOS]
-            </table>
+<h3>Reportes Empleados<br/></h3>
 
-            </body>
-            </html>
+<table align="left" width="100%" cellspacing="0">
+  <tr>
+    <th>Cédula</th>
+    <th>Nombre</th>
+    <th>Apellido</th>
+    <th>Fecha y Hora de Ingreso</th>
+    <th>Evidencia de Ingreso</th>
+  </tr>
+  [DATOS]
+</table>
+
+</body>
+</html>
 """.replace("[DATOS]", datos)
 
         datos = QByteArray()
@@ -153,10 +180,6 @@ class visualizarImprimirExportar(QDialog):
             self.documento.setHtml(unistr)
         else:
             self.documento.setPlainText(unistr)
-
-    def limpiarTabla(self):
-        self.documento.clear()
-        self.treeWidgetUsuarios.clear()
 
     def vistaPrevia(self):
         if not self.documento.isEmpty():
@@ -236,7 +259,6 @@ if __name__ == '__main__':
     aplicacion.setFont(fuente)
     
     ventana = visualizarImprimirExportar()
-    #ventana.Buscar()
     ventana.configurar_Tabla()
     ventana.llenar_Tabla()
     ventana.show()
