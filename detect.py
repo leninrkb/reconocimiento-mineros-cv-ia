@@ -116,21 +116,13 @@ def run(
 
     # Dataloader
     bs = 1  # batch_sizeqq
-    cap=cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    
     if webcam:
         view_img = check_imshow(warn=True)
-        '''dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+        dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset)
-        #print(dataset)'''
-        ret,frame=cap.read()
-        if ret == True:
-            frame = imutils.resize(frame, width=491, height=900)            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(frame)
-            image = ImageTk.PhotoImage(image=img)
-            etiq_video.configure(image=image)
-            etiq_video.image = image
-            etiq_video.after(9, iniciar)
-
+        #print(dataset)
+        
     elif screenshot:
         dataset = LoadScreenshots(source, img_size=imgsz, stride=stride, auto=pt)
     else:

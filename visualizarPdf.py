@@ -20,7 +20,7 @@ class visualizarImprimirExportar(QDialog):
         self.setWindowTitle("Visualizar Datos y Exportar a PDF")
         self.setWindowIcon(QIcon("Qt.png"))
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(721, 700)
+        self.setFixedSize(721, 400)
 
         self.initUI()
 

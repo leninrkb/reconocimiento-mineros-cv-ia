@@ -16,7 +16,7 @@ ventana = tk.Tk()
 ventana.geometry("1241x600+200+10")
 ventana.title("Interfaz")
 ventana.resizable(width=False, height=False)
-fondo = tk.PhotoImage(file="")
+fondo = tk.PhotoImage(file="interfaz.png")
 fondo1 = tk.Label(ventana, image=fondo).place(x=0, y=0, relwidth=1, relheight=1)
 
 # Crear la entrada de texto
