@@ -69,7 +69,7 @@ def guardar():
 
     # Insertar una fila en la tabla "personas"
     query = "INSERT INTO registro_empleado (CED_EMP, FECHA_ENTRADA, CASCO, CHALECO, BOTAS, OBSERVACION, IMAGEN_NOMBRE, PATH) VALUES (%s, %s, %s,%s,%s,%s,%s,%s)"
-    values = ("1804567891", dt, "1", "1", "1", "ninguna", "nombre", PATH)
+    values = ("1804372439", dt, "1", "1", "1", "ninguna", "nombre", PATH)
     cursor.execute(query, values)
 
     cnx.commit()
