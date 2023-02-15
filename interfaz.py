@@ -26,17 +26,19 @@ entry.place(x=664, y=210)
 
 
 def run_command(command):
+    ventana.iconify()
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return stdout, stderr
 
 def mostrar_datos():
+    
     app = QApplication([])
     ventana = visualizarImprimirExportar()
     #ventana = visualizarImprimirExportar()
     #ventana.Buscar()
-    ventana.configurar_Tabla()
-    ventana.llenar_Tabla()
+    ventana.configurar_tabla()
+    ventana.llenar_tabla()
     ventana.exec_()
 
 #Color

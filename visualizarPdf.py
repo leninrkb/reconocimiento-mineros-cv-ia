@@ -1,11 +1,9 @@
 from app_escritorio.conexionBD import Datos
 from app_escritorio.components import components
-#from conexionBD import Datos
-#from components import components
-
-from PyQt5.QtGui  import QIcon, QFont, QTextDocument
+from PyQt5 import QtWidgets
+from PyQt5.QtGui  import QIcon, QFont, QTextDocument, QPixmap
 from PyQt5.QtCore import Qt, QTextCodec, QByteArray, QTranslator, QLocale, QLibraryInfo
-from PyQt5.QtWidgets import (QApplication, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
+from PyQt5.QtWidgets import (QApplication, QTreeWidget, QTreeWidgetItem, QDialog, QPushButton, QTableWidget, QFileDialog,
                              QMessageBox, QToolBar,QTableWidgetItem, QAbstractItemView)
 from PyQt5.QtPrintSupport import QPrintDialog, QPrinter, QPrintPreviewDialog
 from PIL import Image
@@ -13,14 +11,13 @@ from PIL import Image
 # =============== CLASE visualizarImprimirExportar =================
 
 class visualizarImprimirExportar(QDialog):
-    
     def __init__(self, parent=None):
         super(visualizarImprimirExportar, self).__init__()
         
         self.setWindowTitle("Visualizar Datos y Exportar a PDF")
         self.setWindowIcon(QIcon("Qt.png"))
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
-        self.setFixedSize(721, 400)
+        self.setFixedSize(721, 700)
 
         self.initUI()
 
@@ -40,6 +37,24 @@ class visualizarImprimirExportar(QDialog):
     # =================== WIDGET QTABLEWIDGET ===================
         self.tableWidget = QTableWidget(self)
 
+      # =================== WIDGET QTREEWIDGET ===================
+        '''self.treeWidgetUsuarios = QTreeWidget(self)
+
+        self.treeWidgetUsuarios.setFont(QFont(self.treeWidgetUsuarios.font().family(), 10, False))
+        self.treeWidgetUsuarios.setRootIsDecorated(False)
+        self.treeWidgetUsuarios.setHeaderLabels(("CEDULA", "NOMBRE", "APELLIDO", "FECHA DE INGRESO", "EVIDENCIA"))
+
+        self.model = self.treeWidgetUsuarios.model()
+
+        for indice, ancho in enumerate((110, 150, 150, 160), start=0):
+            self.model.setHeaderData(indice, Qt.Horizontal, Qt.AlignCenter, Qt.TextAlignmentRole)
+            self.treeWidgetUsuarios.setColumnWidth(indice, ancho)
+        
+        self.treeWidgetUsuarios.setAlternatingRowColors(True)
+
+        self.treeWidgetUsuarios.setFixedSize(900, 500)
+        self.treeWidgetUsuarios.move(20, 56)'''
+       
       # =================== WIDGETS QPUSHBUTTON ==================
 
         buttonVistaPrevia = QPushButton("Vista previa", self)
@@ -65,23 +80,23 @@ class visualizarImprimirExportar(QDialog):
         buttonExportarPDF.clicked.connect(self.exportarPDF)
 
   # ======================= FUNCIONES ============================
-    def configurar_Tabla(self):
+    def configurar_tabla(self):
         colum_labels = ("Cédula", "Nombre", "Apellido", "Fecha y Hora de Ingreso", "Evidencia")
         self.tableWidget.setColumnCount(len(colum_labels))
         self.tableWidget.setHorizontalHeaderLabels(colum_labels)
         self.tableWidget.setColumnWidth(4,200)
         self.tableWidget.verticalHeader().setDefaultSectionSize(150)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableWidget.setFixedSize(721,500 )
+        self.tableWidget.setFixedSize(721, 500)
 
-    def llenar_Tabla(self):
+
+    def llenar_tabla(self):
         bd = Datos()
         results = bd.obtenerRegistroEmpleado()
         self.tableWidget.setRowCount(len(results))
         datos = ""
-
         for (index_row, row) in enumerate(results): 
-            datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><img src='%s' style='width:50px;height:50px;'></td></tr>" %row
+            datos += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><img src='%s' ></td></tr>" %row
             for (index_cell, cell) in enumerate(row):
                 if index_cell == 4:
                     self.tableWidget.setCellWidget(
@@ -106,12 +121,19 @@ class visualizarImprimirExportar(QDialog):
                 border-collapse: collapse;
                 width: 100%;
                 }
+
+            tr {
+                text-align: center;
+            }
+
+            
             td {
                 text-align: left;
                 padding-top: 4px;
                 padding-right: 6px;
                 padding-bottom: 2px;
                 padding-left: 6px;
+                vertical-align: middle;
             }
             th {
                 text-align: left;
@@ -122,15 +144,18 @@ class visualizarImprimirExportar(QDialog):
             tr:nth-child(even) {
                 background-color: #dddddd;
             }
+
+            
+
             </style>
             </head>
 
             <body>
             <header>
-                <img src="img/logo.jpg" width="800" height="70"/>
+                <img src="app_escritorio/img/logo.jpg" width="700" height="70"/>
             </header>
 
-            <h3>Reportes Empleados<br/></h3>
+            <h3>Reporte Registro Asistencia<br/></h3>
 
             <table align="left" width="100%" cellspacing="0">
             <tr>
@@ -156,10 +181,6 @@ class visualizarImprimirExportar(QDialog):
             self.documento.setHtml(unistr)
         else:
             self.documento.setPlainText(unistr)
-
-    def limpiarTabla(self):
-        self.documento.clear()
-        self.treeWidgetUsuarios.clear()
 
     def vistaPrevia(self):
         if not self.documento.isEmpty():
@@ -199,7 +220,7 @@ class visualizarImprimirExportar(QDialog):
 
     def exportarPDF(self):
         if not self.documento.isEmpty():
-            nombreArchivo, _ = QFileDialog.getSaveFileName(self, "Exportar a PDF", "Listado de empleados",
+            nombreArchivo, _ = QFileDialog.getSaveFileName(self, "Exportar a PDF", "Registro Asistencia",
                                                            "Archivos PDF (*.pdf);;All Files (*)",
                                                            options=QFileDialog.Options())
 
@@ -240,8 +261,8 @@ if __name__ == '__main__':
     
     ventana = visualizarImprimirExportar()
     #ventana.Buscar()
-    #ventana.configurar_Tabla()
-    #ventana.llenar_Tabla()
+    ventana.configurar_tabla()
+    ventana.llenar_tabla()
     ventana.show()
     
 

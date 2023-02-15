@@ -1,9 +1,13 @@
 import argparse
+from datetime import date
+from datetime import datetime
 import os
 import platform
 import sys
 from pathlib import Path
 import tkinter as tk
+import MySQLdb
+import mysql.connector
 
 import torch as torch
 from PIL import Image, ImageTk
@@ -12,10 +16,17 @@ import imutils
 
 
 import torch
+#CONEXION
+cnx = mysql.connector.connect(
+    user='root',
+    password='',
+    host='localhost',
+    database='proyecto_mineros'
+)
 
 #INTERFAZ
 ventana = tk.Tk()
-ventana.geometry("994x699+200+10")
+ventana.geometry("955x650+200+10")
 ventana.title("Interfaz")
 ventana.resizable(width=False, height=False)
 fondo = tk.PhotoImage(file="camara.png")
@@ -27,9 +38,41 @@ def iniciar():
     main(opt)
 
 def quitar():
-    global cap
-    #etiq_cap.place_forget()
-    cap.release()
+    ventana.destroy()
+
+def imagen():
+    frame = imutils.resize(im0, width=491, height=900)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    img = Image.fromarray(frame)
+    image = ImageTk.PhotoImage(image=img)
+    etiq_video.configure(image=image)
+    etiq_video.image = image
+    #cv2.imshow(im0)
+
+def guardar():
+    frame = im0
+    frame = cv2.resize(frame, (180, 180))
+    carpeta = "img/"
+
+    today = str(date.today())
+    dt = datetime.now()
+    hour = str(dt.hour)
+    minut =str( dt.minute)
+    seconds = str(dt.second)
+    microseconds= str(dt.microsecond)
+
+    extencion = ".jpg"
+    PATH=carpeta+today+'-'+hour+minut+seconds+microseconds+extencion
+    cv2.imwrite(carpeta+today+'-'+hour+minut+seconds+microseconds+extencion, frame)
+
+    cursor = cnx.cursor()
+
+    # Insertar una fila en la tabla "personas"
+    query = "INSERT INTO registro_empleado (CED_EMP, FECHA_ENTRADA, CASCO, CHALECO, BOTAS, OBSERVACION, IMAGEN_NOMBRE, PATH) VALUES (%s, %s, %s,%s,%s,%s,%s,%s)"
+    values = ("1804567891", dt, "1", "1", "1", "ninguna", "nombre", PATH)
+    cursor.execute(query, values)
+
+    cnx.commit()
 
 #Color
 fondo_boton = "#FFF"
@@ -38,16 +81,20 @@ fondo_boton = "#FFF"
 #BOTONES
 boton = tk.Button(ventana, text="INICIAR", bg=fondo_boton, relief="flat",
                   cursor="hand2", command=iniciar, width=15, height=2, font=("Calisto MT", 12, "bold"))
-boton.place(x=165, y=590)
+boton.place(x=130, y=530)
 
-boton2 = tk.Button(ventana, text="APAGAR", bg=fondo_boton, relief="flat",
+boton2 = tk.Button(ventana, text="CERRAR", bg=fondo_boton, relief="flat",
                   cursor="hand2", command=quitar, width=15, height=2, font=("Calisto MT", 12, "bold"))
-boton2.place(x=665, y=590)
+boton2.place(x=690, y=530)
+
+boton3 = tk.Button(ventana, text="GUARDAR", bg=fondo_boton, relief="flat",
+                  cursor="hand2", command=guardar, width=15, height=2, font=("Calisto MT", 12, "bold"))
+boton3.place(x=410, y=530)
 
 
 #Etiqueta
 etiq_video = tk.Label(ventana, bg="black")
-etiq_video.place(x=247, y=119)
+etiq_video.place(x=240, y=105)
 
 
 FILE = Path(__file__).resolve()
@@ -158,6 +205,7 @@ def run(
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
         # Process predictions
+        global im0
         for i, det in enumerate(pred):  # per image
             seen += 1
             if webcam:  # batch_size >= 1
@@ -198,6 +246,7 @@ def run(
                         save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
             # Stream results
+            
             im0 = annotator.result()
             if view_img:
                 if platform.system() == 'Linux' and p not in windows:
@@ -206,6 +255,7 @@ def run(
                     cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
                 cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
+            imagen()
 
             # Save results (image with detections)
             if save_img:
@@ -243,10 +293,11 @@ def run(
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
 
 
+#from variables import MODELO, CONFIANZA
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best.pt', help='model path or triton URL')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best_exp9.pt', help='model path or triton URL')
     parser.add_argument('--source', type=str, default=ROOT / '0', help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
