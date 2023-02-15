@@ -62,7 +62,7 @@ from utils.torch_utils import select_device, smart_inference_mode
 @smart_inference_mode()
 def run(
         weights=ROOT / 'yolov5s.pt',  # model path or triton URL
-        source=ROOT / 'file/dir/URL/glob/screen/0',  # file/dir/URL/glob/screen/0(webcam)
+        source=ROOT / '0',  # file/dir/URL/glob/screen/0(webcam)
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(640, 640),  # inference size (height, width)
         conf_thres=0.25,  # confidence threshold
@@ -110,10 +110,21 @@ def run(
 
     # Dataloader
     bs = 1  # batch_sizeqq
+    cap=cv2.VideoCapture(0,cv2.CAP_DSHOW)
     if webcam:
         view_img = check_imshow(warn=True)
-        dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
+        '''dataset = LoadStreams(source, img_size=imgsz, stride=stride, auto=pt, vid_stride=vid_stride)
         bs = len(dataset)
+        #print(dataset)'''
+        ret,frame=cap.read()
+        if ret == True:
+            frame = imutils.resize(frame, width=491, height=900)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(frame)
+            image = ImageTk.PhotoImage(image=img)
+            etiq_video.configure(image=image)
+            etiq_video.image = image
+            #etiq_video.after(9, iniciar)
     elif screenshot:
         dataset = LoadScreenshots(source, img_size=imgsz, stride=stride, auto=pt)
     else:
@@ -236,7 +247,7 @@ def parse_opt():
     parser.add_argument('--source', type=str, default=ROOT / '0', help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
-    parser.add_argument('--conf-thres', type=float, default=0.80, help='confidence threshold')
+    parser.add_argument('--conf-thres', type=float, default=0.40, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
