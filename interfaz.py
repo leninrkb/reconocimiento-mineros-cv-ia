@@ -7,8 +7,8 @@ import imutils
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
-from app_escritorio.visualizarPdf import visualizarImprimirExportar
-app = QApplication(sys.argv)
+from visualizarPdf import visualizarImprimirExportar
+
 
 
 #Interfaz
@@ -31,14 +31,13 @@ def run_command(command):
     return stdout, stderr
 
 def mostrar_datos():
-    # Crear una instancia de la clase MiClase
-    mi_clase =  visualizarImprimirExportar()
-
-    # Mostrar la ventana
-    mi_clase.show()
-
-    # Iniciar la aplicación
-    sys.exit(app.exec_())
+    app = QApplication([])
+    ventana = visualizarImprimirExportar()
+    #ventana = visualizarImprimirExportar()
+    #ventana.Buscar()
+    ventana.configurar_Tabla()
+    ventana.llenar_Tabla()
+    ventana.exec_()
 
 #Color
 fondo_boton = "#FFF"

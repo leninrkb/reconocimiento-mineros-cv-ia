@@ -1,5 +1,7 @@
 from app_escritorio.conexionBD import Datos
 from app_escritorio.components import components
+#from conexionBD import Datos
+#from components import components
 
 from PyQt5.QtGui  import QIcon, QFont, QTextDocument
 from PyQt5.QtCore import Qt, QTextCodec, QByteArray, QTranslator, QLocale, QLibraryInfo
@@ -11,6 +13,7 @@ from PIL import Image
 # =============== CLASE visualizarImprimirExportar =================
 
 class visualizarImprimirExportar(QDialog):
+    
     def __init__(self, parent=None):
         super(visualizarImprimirExportar, self).__init__()
         
@@ -237,8 +240,8 @@ if __name__ == '__main__':
     
     ventana = visualizarImprimirExportar()
     #ventana.Buscar()
-    ventana.configurar_Tabla()
-    ventana.llenar_Tabla()
+    #ventana.configurar_Tabla()
+    #ventana.llenar_Tabla()
     ventana.show()
     
 
