@@ -93,7 +93,7 @@ boton3.place(x=410, y=530)
 
 
 #Etiqueta
-etiq_video = tk.Label(ventana, bg="black")
+etiq_video = tk.Label(ventana, bg="#104b8d")
 etiq_video.place(x=240, y=105)
 
 
@@ -300,7 +300,7 @@ def run(
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best_exp9.pt', help='model path or triton URL')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best_1.pt', help='model path or triton URL')
     parser.add_argument('--source', type=str, default=ROOT / '0', help='file/dir/URL/glob/screen/0(webcam)')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
